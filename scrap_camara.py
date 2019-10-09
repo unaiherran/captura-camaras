@@ -5,6 +5,8 @@ from io import BytesIO
 
 from datetime import datetime
 
+import csv
+
 import logging
 
 
@@ -70,21 +72,28 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0):
     return output_list
 
 
+def leer_listado_camaras():
+    file_name = "lista_camaras.csv"
 
-#todo
-
-def obtener_listado_camaras():
-    pass
-
+    with open(file_name, newline='') as file:
+        reader = csv.reader(file)
+        l = list(map(tuple, reader))
+    return l
 
 def scrap_video():
     pass
 
-def leer_listado_camaras():
-    pass
+def actualizar_listado_camaras(l):
+    file_name = "lista_camaras1.csv"
+
+    with open(file_name, 'w', newline='\n') as myfile:
+        wr = csv.writer(myfile, lineterminator='\n')
+        wr.writerow(l)
 
 
 if __name__ == '__main__':
-
-
-    crawl()
+    print(datetime.now())
+    l = leer_listado_camaras()
+    otra = crawl(l)
+    actualizar_listado_camaras(otra)
+    print(datetime.now())
