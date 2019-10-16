@@ -158,7 +158,7 @@ def main():
     #while True:
     process_files(verbose=verbose)
     delete_old_files(verbose=verbose)
-    #time.sleep(1)
+    #time.sleep(10)
 
 if __name__ == '__main__':
     main()
