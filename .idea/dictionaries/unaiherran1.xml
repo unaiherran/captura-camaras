@@ -2,10 +2,14 @@
   <dictionary name="unaiherran1">
     <words>
       <w>actualizada</w>
+      <w>adquiridos</w>
       <w>archivo</w>
       <w>camara</w>
       <w>conectarte</w>
+      <w>copiar</w>
+      <w>destino</w>
       <w>devuelve</w>
+      <w>directorio</w>
       <w>errores</w>
       <w>estatus</w>
       <w>gestion</w>
@@ -13,8 +17,14 @@
       <w>inputfile</w>
       <w>lanza</w>
       <w>nuevo</w>
+      <w>otra</w>
       <w>outputfile</w>
+      <w>proccesed</w>
+      <w>procesado</w>
+      <w>procesarlo</w>
+      <w>procesed</w>
       <w>resultado</w>
+      <w>subido</w>
       <w>válida</w>
     </words>
   </dictionary>
