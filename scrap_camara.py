@@ -16,9 +16,6 @@ from utils import setup_logger
 
 
 def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = False):
-    now = datetime.now()
-    fecha_str = str(now.year) + str(now.month) + str(now.day) + '_' + str(now.hour) + str(now.minute)
-
     output_list = []
 
     logger = setup_logger('crawler_log', 'crawler.log')
@@ -34,6 +31,10 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
         i += 1
         address = camera[1]
         status = int(camera[5])
+
+        now = datetime.now()
+        fecha_str = str(now.year) + str(now.month) + str(now.day) + '_' + str(now.hour) + str(now.minute)
+
         name = settings.SCRAP_DIR + camera[0] + '_' + fecha_str + '.jpg'
 
         if status <= status_req:
@@ -208,5 +209,4 @@ def main():
 
 
 if __name__ == '__main__':
-    #main(sys.argv[1:])
     main()
