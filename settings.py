@@ -12,7 +12,6 @@ headers = {'User-Agent': 'Crawler para Proyecto Estudiante Big Data - unai.herra
 SCRAP_DIR = 'scrapped/'
 PROCCESED_DIR = 'procesed/'
 
-
 OUTPUT_RESOLUTION_HEIGHT = 200
 OUTPUT_RESOLUTION_WIDTH = 360
 
