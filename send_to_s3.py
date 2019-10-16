@@ -2,8 +2,7 @@
 
 import glob, os, sys
 import argparse
-from time import sleep
-
+import time
 import settings
 
 import boto3
@@ -37,77 +36,51 @@ def get_hash(filename, first_chunk_only=False, hash=hashlib.sha1):
     return hashed
 
 
-def check_for_duplicates(paths, hash=hashlib.sha1):
-    hashes_by_size = {}
-    hashes_on_1k = {}
-    hashes_full = {}
-
-    for path in paths:
-        for dirpath, dirnames, filenames in os.walk(path):
-            for filename in filenames:
-                full_path = os.path.join(dirpath, filename)
-                try:
-                    # if the target is a symlink (soft one), this will
-                    # dereference it - change the value to the actual target file
-                    full_path = os.path.realpath(full_path)
-                    file_size = os.path.getsize(full_path)
-                except (OSError,):
-                    # not accessible (permissions, etc) - pass on
-                    continue
-
-                duplicate = hashes_by_size.get(file_size)
-
-                if duplicate:
-                    hashes_by_size[file_size].append(full_path)
-                else:
-                    hashes_by_size[file_size] = []  # create the list for this file size
-                    hashes_by_size[file_size].append(full_path)
-
-    # For all files with the same file size, get their hash on the 1st 1024 bytes
-    for __, files in hashes_by_size.items():
-        if len(files) < 2:
-            continue    # this file size is unique, no need to spend cpy cycles on it
-
-        for filename in files:
-            try:
-                small_hash = get_hash(filename, first_chunk_only=True)
-            except (OSError,):
-                # the file access might've changed till the exec point got here
-                continue
-
-            duplicate = hashes_on_1k.get(small_hash)
-            if duplicate:
-                hashes_on_1k[small_hash].append(filename)
-            else:
-                hashes_on_1k[small_hash] = []          # create the list for this 1k hash
-                hashes_on_1k[small_hash].append(filename)
-
-    # For all files with the hash on the 1st 1024 bytes, get their hash on the full file - collisions will be duplicates
-    for __, files in hashes_on_1k.items():
-        if len(files) < 2:
-            continue    # this hash of fist 1k file bytes is unique, no need to spend cpy cycles on it
-
-        for filename in files:
-            try:
-                full_hash = get_hash(filename, first_chunk_only=False)
-            except (OSError,):
-                # the file access might've changed till the exec point got here
-                continue
-
-            duplicate = hashes_full.get(full_hash)
-            if duplicate:
-                print("Duplicate found: %s and %s" % (filename, duplicate))
-            else:
-                hashes_full[full_hash] = filename
-
-
 def is_processed(filename):
     # Basado en https://stackoverflow.com/questions/748675/finding-duplicate-files-and-removing-them
 
-    return True
+    # sacar el tamaño del archivo que estamos mirando.
+    size = os.path.getsize(filename)
+    # sacar el hash del primer chunk
+    small_hash = get_hash(filename, first_chunk_only=True)
+    # sacar el hash del archivo
+    full_hash = get_hash(filename, first_chunk_only=False)
+
+    respuesta = False
+
+    # recorrer los archivos que hay en el directorio processed
+    directorio = settings.PROCCESED_DIR + '*'
+
+    for archivo in glob.glob(directorio):
+        archivo_size = os.path.getsize(archivo)
+        if size != archivo_size:
+            # si el tamaño es distinto, seguir.
+            continue
+        else:
+            # si el tamaño es el mismo comprobar hash de primer chunk
+            archivo_small_hash = get_hash(archivo, first_chunk_only=True)
+            print("Filename: %s Size: %s Small Hash: %s, Full_Hash= %s" % (filename, size, small_hash, full_hash))
+            print("Comparado con Filename: %s Size: %s Small Hash: %s " % (archivo, archivo_size, archivo_small_hash))
+
+            if small_hash != archivo_small_hash:
+                # si el primer chunk es distinto continuar
+                continue
+            else:
+                # si es el mismo calcular el hash del archivo
+                archivo_full_hash = get_hash(archivo, first_chunk_only=False)
+                if full_hash != archivo_full_hash:
+                    # si es distinto continuar
+                    continue
+                else:
+                    # si es el mismo salir del bucle y devolver true
+                    respuesta = True
+                    break
+
+    # cuando termina el bucle devolver False
+    return respuesta
 
 
-def process_files(verbose):
+def process_files(verbose=False):
 
     process_logger = setup_logger('process_log', 'process_image.log')
     directorio = settings.SCRAP_DIR + '*'
@@ -122,13 +95,12 @@ def process_files(verbose):
     for file in glob.glob(directorio):
         file_name = file[longitud_scrap_dir:]
 
-        # Mirar si esta ya procesado (Hashes y demas)
-
+        # Mirar si esta ya procesado (tamaño, small hash y full hash)
         if not is_processed(file):
             # copiar a amazon
             data = open(file, "rb")
             key = 'camera_images/'+file_name
-            # s3.Bucket(bucket_name).put_object(Key=key, Body=data)
+            s3.Bucket(bucket_name).put_object(Key=key, Body=data)
             mensaje = '%s subido a bucket %s/camera_images' %(file_name, bucket_name)
             process_logger.info(mensaje)
             if verbose:
@@ -136,7 +108,7 @@ def process_files(verbose):
 
             # mover a directorio de procesado
             destino = settings.PROCCESED_DIR + file_name
-            # os.rename(file, destino)
+            os.rename(file, destino)
             mensaje = '%s movido a processed/%s' %(file, file_name)
             process_logger.info(mensaje)
             if verbose:
@@ -144,12 +116,22 @@ def process_files(verbose):
 
         else:
             # borrar archivo para no procesarlo otra vez)
-            #  os.remove(file)
+            os.remove(file)
             mensaje = '%s ya estaba procesado, asi que lo borro' %file
             process_logger.info(mensaje)
             if verbose:
                 print(mensaje)
 
+
+def delete_old_files(minutes=30, verbose=False):
+    directorio = settings.PROCCESED_DIR + '*'
+    max_time = time.time() + (minutes*60)
+
+    for archivo in glob.glob(directorio):
+        fecha = os.path.getmtime(archivo)
+
+        if fecha < max_time:
+            os.remove(archivo)
 
 def main():
     descripcion = """Esta es la ayuda del script"""
@@ -175,7 +157,8 @@ def main():
 
     #while True:
     process_files(verbose=verbose)
-    sleep(1)
+    delete_old_files(verbose=verbose)
+    #time.sleep(1)
 
 if __name__ == '__main__':
     main()

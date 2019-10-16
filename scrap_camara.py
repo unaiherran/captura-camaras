@@ -131,7 +131,7 @@ def main():
     parser = argparse.ArgumentParser(description=descripcion)
     parser.add_argument("-V", "--version", help="show program version", action="store_true")
     parser.add_argument("-I", "--input", help="CSV file with list of cameras")
-    parser.add_argument("-O", "--scrapped", help="Output CSV file with list of cameras with updated success level")
+    parser.add_argument("-O", "--output", help="Output CSV file with list of cameras with updated success level")
     parser.add_argument("-s", "--status_requested", help="status requested (0, las que responden siempre)")
     parser.add_argument("-v", "--verbose", help="", action="store_true")
 
