@@ -162,7 +162,7 @@ def main():
     elif args.input:
         outputfile = inputfile
     else:
-        outputfile = 'lista_camaras_test_out.csv'
+        outputfile = 'lista_camaras.csv'
 
     if args.status_requested:
         status_requested = int(args.status_requested)
