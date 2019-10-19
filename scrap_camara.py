@@ -16,7 +16,7 @@ import csv
 from utils import setup_logger
 
 
-def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = False):
+def crawl(lista_camaras=settings.lista_camaras, status_req=0, verbose=False):
     logger = setup_logger('crawler_log', 'crawler.log')
 
     output_list = []
@@ -41,7 +41,8 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
         status = int(camera[5])
 
         now = datetime.now()
-        fecha_str = str(now.year) + str(now.month) + str(now.day) + '_' + str(now.hour) + str(now.minute)
+        fecha_str = '{0}{1}{2}_{3}{4}'.format(str(now.year), str(now.month).zfill(2), str(now.day).zfill(2),
+                                              str(now.hour).zfill(2), str(now.minute).zfill(2))
 
         name = settings.SCRAP_DIR + camera[0] + '_' + fecha_str + '.jpg'
 
@@ -49,7 +50,7 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
             # conectarte a la url
             response = requests.get(address, settings.headers)
             if verbose:
-                print('Leyendo Feed (%s/%s): %s' %(i, total_de_camaras,address))
+                print('Leyendo Feed (%s/%s): %s' % (i, total_de_camaras, address))
 
             # gestion de errores HTTP
 
@@ -58,19 +59,19 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
                 status += 100
                 errores += 1
                 logger.error('Camera: %s Feed %s da un error %s. Nuevo Status: %s' % (camera[0], camera[1],
-                              response.status_code, status))
+                                                                                      response.status_code, status))
                 if verbose:
                     print('ERROR: Camera: %s Feed %s da un error %s. Nuevo Status: %s' % (camera[0], camera[1],
-                              response.status_code, status))
+                                                                                          response.status_code, status))
 
             elif response.status_code >= 400:  # Client Error
                 status += 10
                 errores += 1
                 logger.error('Camera: %s Feed %s da un error %s.  Nuevo Status: %s' % (camera[0], camera[1],
-                              response.status_code, status))
+                                                                                       response.status_code, status))
                 if verbose:
                     print('ERROR: Camera: %s Feed %s da un error %s. Nuevo Status: %s' % (camera[0], camera[1],
-                              response.status_code, status))
+                                                                                          response.status_code, status))
 
             elif response.status_code == 200:
                 # ver si es imagen
@@ -79,7 +80,7 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
                     img = Image.open(BytesIO(response.content))
                     # resize file
                     # Probablemente se tenga que hacer en otro proceso
-                    #img = img.resize((settings.OUTPUT_RESOLUTION_WIDTH, settings.OUTPUT_RESOLUTION_HEIGHT),
+                    # img = img.resize((settings.OUTPUT_RESOLUTION_WIDTH, settings.OUTPUT_RESOLUTION_HEIGHT),
                     #                 Image.ANTIALIAS)
                     # save image
                     img.save(name, settings.IMG_OUTPUT_FORMAT)
@@ -97,7 +98,7 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
                                  camera[0], camera[1], status)
                     if verbose:
                         print('ERROR: Camera: %s Feed %s, no es una imagen válida. Nuevo Status: %s',
-                                 camera[0], camera[1], status)
+                              camera[0], camera[1], status)
 
         e = [camera[0], camera[1], camera[2], camera[3], camera[4], str(status)]
 
@@ -121,7 +122,7 @@ def scrap_video():
     pass
 
 
-def actualizar_listado_camaras(l, file_name = "lista_camaras1.csv"):
+def actualizar_listado_camaras(l, file_name="lista_camaras1.csv"):
     """Actualiza el csv del listado de camaras para el siguiente crawl. Graba el archivo segun el nombre que le pases
     en el parametro file_name"""
 
@@ -152,7 +153,7 @@ def main():
 
     if args.input:
         inputfile = args.input
-        #todo comprobar que existe el fichero
+        # todo comprobar que existe el fichero
 
     else:
         inputfile = 'lista_camaras.csv'
@@ -176,10 +177,10 @@ def main():
 
     inicio = datetime.now()
 
-    scrap_logger.info('Input file is: %s' %(inputfile))
-    scrap_logger.info('Output file is %s' %(outputfile))
-    scrap_logger.info('Status requested is %s' %(status_requested))
-    scrap_logger.info('Inicio del scrap %s' %(inicio))
+    scrap_logger.info('Input file is: %s' % (inputfile))
+    scrap_logger.info('Output file is %s' % (outputfile))
+    scrap_logger.info('Status requested is %s' % (status_requested))
+    scrap_logger.info('Inicio del scrap %s' % (inicio))
     if verbose:
         print('Input file is', inputfile)
         print('Output file is', outputfile)
@@ -192,8 +193,8 @@ def main():
     lista_camara_actualizada, errores, adquiridos = crawl(lista_camaras=lista_camara, status_req=status_requested,
                                                           verbose=verbose)
 
-    resultado_crawl = "De %s pedidos, se han adquirido %s imagenes, con %s errores" %(len(lista_camara), adquiridos,
-                                                                                      errores)
+    resultado_crawl = "De %s pedidos, se han adquirido %s imagenes, con %s errores" % (len(lista_camara), adquiridos,
+                                                                                       errores)
 
     if verbose:
         print(resultado_crawl)
@@ -209,10 +210,10 @@ def main():
     fin = datetime.now()
     duracion = fin - inicio
 
-    scrap_logger.info('Fin del Scrap %s' %(fin))
-    scrap_logger.info('INFO: Me ha costado hacer el crawl %s' %(str(duracion)))
+    scrap_logger.info('Fin del Scrap %s' % (fin))
+    scrap_logger.info('INFO: Me ha costado hacer el crawl %s' % (str(duracion)))
     if verbose:
-        print('Fin de la operación',fin)
+        print('Fin de la operación', fin)
         print('Duración', duracion)
 
 
