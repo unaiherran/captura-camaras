@@ -81,8 +81,18 @@ def is_processed(filename):
 
 
 def process_files(verbose=False):
-
     process_logger = setup_logger('process_log', 'process_image.log')
+
+    output_list = []
+
+    # Si no existe process dir, crearlo
+    if not os.path.isdir(settings.PROCCESED_DIR):
+        os.mkdir(settings.PROCCESED_DIR)
+        mensaje = 'No existe el directorio %s. Se crea' % settings.PROCCESED_DIR
+        process_logger.info(mensaje)
+        if verbose:
+            print(mensaje)
+            
     directorio = settings.SCRAP_DIR + '*'
     longitud_scrap_dir = len(settings.SCRAP_DIR)
 
@@ -163,6 +173,7 @@ def main():
             print('Esperando un rato...')
 
         time.sleep(60)
+
 
 if __name__ == '__main__':
     main()
