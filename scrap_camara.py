@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys, getopt
+import os
 import argparse
 
 import requests
@@ -16,9 +17,16 @@ from utils import setup_logger
 
 
 def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = False):
-    output_list = []
-
     logger = setup_logger('crawler_log', 'crawler.log')
+
+    output_list = []
+    # Si no existe scrapped dir, crearlo
+    if not os.path.isdir(settings.SCRAP_DIR):
+        os.mkdir(settings.SCRAP_DIR)
+        mensaje = 'No existe el directorio %s. Se crea' % settings.SCRAP_DIR
+        logger.info(mensaje)
+        if verbose:
+            print(mensaje)
 
     errores = 0
     adquiridos = 0
@@ -49,20 +57,20 @@ def crawl(lista_camaras = settings.lista_camaras, status_req = 0, verbose = Fals
                 # cambiar el estatus de la camara
                 status += 100
                 errores += 1
-                logger.error('Camera: %s Feed %s da un error %s. Nuevo Status: %s', camera[0], camera[1],
-                              response.status_code, status)
+                logger.error('Camera: %s Feed %s da un error %s. Nuevo Status: %s' % (camera[0], camera[1],
+                              response.status_code, status))
                 if verbose:
-                    print('ERROR: Camera: %s Feed %s da un error %s. Nuevo Status: %s', camera[0], camera[1],
-                              response.status_code, status)
+                    print('ERROR: Camera: %s Feed %s da un error %s. Nuevo Status: %s' % (camera[0], camera[1],
+                              response.status_code, status))
 
             elif response.status_code >= 400:  # Client Error
                 status += 10
                 errores += 1
-                logger.error('Camera: %s Feed %s da un error %s.  Nuevo Status: %s', camera[0], camera[1],
-                              response.status_code, status)
+                logger.error('Camera: %s Feed %s da un error %s.  Nuevo Status: %s' % (camera[0], camera[1],
+                              response.status_code, status))
                 if verbose:
-                    print('ERROR: Camera: %s Feed %s da un error %s. Nuevo Status: %s', camera[0], camera[1],
-                              response.status_code, status)
+                    print('ERROR: Camera: %s Feed %s da un error %s. Nuevo Status: %s' % (camera[0], camera[1],
+                              response.status_code, status))
 
             elif response.status_code == 200:
                 # ver si es imagen
