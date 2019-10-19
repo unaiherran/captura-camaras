@@ -97,7 +97,9 @@ def process_files(verbose=False):
 
         # Mirar si esta ya procesado (tamaño, small hash y full hash)
         if not is_processed(file):
-            # copiar a amazon
+            #todo pasarlo por rekognize
+
+            # copiar a amazon s3
             data = open(file, "rb")
             key = 'camera_images/'+file_name
             s3.Bucket(bucket_name).put_object(Key=key, Body=data)
@@ -157,7 +159,10 @@ def main():
     while True:
         process_files(verbose=verbose)
         delete_old_files(minutes=30, verbose=verbose)
-        time.sleep(10)
+        if verbose:
+            print('Esperando un rato...')
+
+        time.sleep(60)
 
 if __name__ == '__main__':
     main()

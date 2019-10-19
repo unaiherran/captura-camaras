@@ -3,7 +3,7 @@ lista_camaras = [['0001', 'http://informo.munimadrid.es/cameras/Camara06303.jpg'
                 ['0003', 'http://informo.munimadrid.es/cameras/Camara06305.jpg', 'S', '45.19','41.32', '0'],
                 ['0004', 'http://informo.munimadrid.es/cameras/Camara06306.jpg', 'S', '45.19','41.32', '0']]
 
-version_scrap = "0.3"
+version_scrap = "0.3.1"
 version_a_s3 = "0.2"
 
 # Variables para el crawler
