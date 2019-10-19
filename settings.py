@@ -4,7 +4,7 @@ lista_camaras = [['0001', 'http://informo.munimadrid.es/cameras/Camara06303.jpg'
                 ['0004', 'http://informo.munimadrid.es/cameras/Camara06306.jpg', 'S', '45.19','41.32', '0']]
 
 version_scrap = "0.3.1"
-version_a_s3 = "0.2"
+version_a_s3 = "0.2.1"
 
 # Variables para el crawler
 headers = {'User-Agent': 'Crawler para Proyecto Estudiante Big Data - unai.herran@gmail.com'}

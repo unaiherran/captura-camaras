@@ -92,7 +92,7 @@ def process_files(verbose=False):
         process_logger.info(mensaje)
         if verbose:
             print(mensaje)
-            
+
     directorio = settings.SCRAP_DIR + '*'
     longitud_scrap_dir = len(settings.SCRAP_DIR)
 
