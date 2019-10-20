@@ -31,3 +31,9 @@ if connection.is_connected():
              f'({row[0]}, {row[1]}, {row[3]}, {row[4]}, {video}, {foto})'
 
         print(sql)
+        cursor.execute(sql)
+
+    # close the connection to the database.
+    connection.commit()
+    cursor.close()
+    print("Done")
