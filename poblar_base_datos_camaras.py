@@ -28,7 +28,7 @@ if connection.is_connected():
             video = True
 
         sql = f'INSERT INTO CamarasTrafico(id_camara,feed,longitud,latitud,video,foto) VALUES' \
-             f'({row[0]}, {row[1]}, {row[3]}, {row[4]}, {video}, {foto})'
+             f'({row[0]}, "{row[1]}", {row[3]}, {row[4]}, {video}, {foto});'
 
         print(sql)
         cursor.execute(sql)

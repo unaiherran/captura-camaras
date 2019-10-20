@@ -8,6 +8,8 @@ pillow = "*"
 requests = "*"
 "bs4" = "*"
 "boto3" = "*"
+mysql-connector-python = "*"
+pandas = "*"
 
 [dev-packages]
 
