@@ -102,18 +102,25 @@ def process_files(verbose=False):
                         )
     bucket_name = 'proyecto-bd3-ff'
 
-    for file in glob.glob(directorio):
+    lista_archivos = glob.glob(directorio)
+    total_de_archivos = len(lista_archivos)
+
+    i = 0
+
+    for file in lista_archivos:
+        i += 1
+
         file_name = file[longitud_scrap_dir:]
 
         # Mirar si esta ya procesado (tamaño, small hash y full hash)
         if not is_processed(file):
-            #todo pasarlo por rekognize
+            # todo pasarlo por rekognize
 
             # copiar a amazon s3
             data = open(file, "rb")
-            key = 'camera_images/'+file_name
+            key = 'camera_images/' + file_name
             s3.Bucket(bucket_name).put_object(Key=key, Body=data)
-            mensaje = '%s subido a bucket %s/camera_images' %(file_name, bucket_name)
+            mensaje = '(%s/%s) %s subido a bucket %s/camera_images' % (i, total_de_archivos, file_name, bucket_name)
             process_logger.info(mensaje)
             if verbose:
                 print(mensaje)
@@ -121,7 +128,7 @@ def process_files(verbose=False):
             # mover a directorio de procesado
             destino = settings.PROCCESED_DIR + file_name
             os.rename(file, destino)
-            mensaje = '%s movido a processed/%s' %(file, file_name)
+            mensaje = '\t %s movido a processed/%s' % (file, file_name)
             process_logger.info(mensaje)
             if verbose:
                 print(mensaje)
@@ -129,7 +136,7 @@ def process_files(verbose=False):
         else:
             # borrar archivo para no procesarlo otra vez)
             os.remove(file)
-            mensaje = '%s ya estaba procesado, asi que lo borro' %file
+            mensaje = '\t %s ya estaba procesado, asi que lo borro' % file
             process_logger.info(mensaje)
             if verbose:
                 print(mensaje)
@@ -137,13 +144,20 @@ def process_files(verbose=False):
 
 def delete_old_files(minutes=30, verbose=False):
     directorio = settings.PROCCESED_DIR + '*'
-    max_time = time.time() + (minutes*60)
+    max_time = time.time() - (minutes * 60)
 
     for archivo in glob.glob(directorio):
         fecha = os.path.getmtime(archivo)
 
         if fecha < max_time:
             os.remove(archivo)
+            if verbose:
+                print('Borrando archivo: %s' % archivo)
+                print('Fecha del archivo: %s, \nFecha máxima: max_time %s' % (time.strftime('%Y-%m-%dT%H:%M:%S',
+                                                                                            time.localtime(fecha)),
+                                                                              time.strftime('%Y-%m-%dT%H:%M:%S',
+                                                                                            time.localtime(max_time))))
+
 
 def main():
     descripcion = """Esta es la ayuda del script"""
@@ -166,13 +180,15 @@ def main():
     else:
         verbose = False
 
-    while True:
-        process_files(verbose=verbose)
-        delete_old_files(minutes=30, verbose=verbose)
-        if verbose:
-            print('Esperando un rato...')
+    verbose = True
 
-        time.sleep(60)
+    # while True:
+    process_files(verbose=verbose)
+    delete_old_files(minutes=15, verbose=verbose)
+    if verbose:
+        print('Esperando un rato...')
+
+    time.sleep(1)
 
 
 if __name__ == '__main__':
