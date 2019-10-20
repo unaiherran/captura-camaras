@@ -80,6 +80,31 @@ def is_processed(filename):
     return respuesta
 
 
+def count_cars(photo, bucket):
+
+    client = boto3.client('rekognition')
+    max_labels = settings.MAX_LABELS
+
+    response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}}, MaxLabels=max_labels)
+
+    number_of_cars = 0
+
+    print(response['ResponseMetadata']['HTTPStatusCode'])
+
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        for label in response['Labels']:
+            if label['Name'] == 'Car':
+                if label['Confidence'] >= settings.CONFIDENCE_LEVEL_LABEL:
+                    lista_coches = label['Instances']
+                    for coches in lista_coches:
+                        if coches['Confidence'] >= settings.CONFIDENCE_LEVEL_CAR:
+                            number_of_cars += 1
+    else:
+        number_of_cars = 9999
+
+    return number_of_cars, response
+
+
 def process_files(verbose=False):
     process_logger = setup_logger('process_log', 'process_image.log')
 
@@ -114,7 +139,6 @@ def process_files(verbose=False):
 
         # Mirar si esta ya procesado (tamaño, small hash y full hash)
         if not is_processed(file):
-            # todo pasarlo por rekognize
 
             # copiar a amazon s3
             data = open(file, "rb")
@@ -124,6 +148,11 @@ def process_files(verbose=False):
             process_logger.info(mensaje)
             if verbose:
                 print(mensaje)
+
+            # pasarlo por rekognize
+            num_cars, response = count_cars(key, bucket_name)
+
+            # todo escribir en BDD
 
             # mover a directorio de procesado
             destino = settings.PROCCESED_DIR + file_name
