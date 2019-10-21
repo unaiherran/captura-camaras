@@ -175,13 +175,15 @@ def process_files(verbose=False):
                 sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
                       f'({id_camara}, "{key}", "{response}", {num_cars}, {fecha_imagen});'
 
+                mini_sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
+                      f'({id_camara}, "{key}", "[response]", {num_cars}, {fecha_imagen});'
                 cursor.execute(sql)
+
                 connection.commit()
                 if verbose:
-                    print(sql)
-                    
-                process_logger.info(sql)
+                    print(mini_sql)
 
+                process_logger.info(mini_sql)
 
                 # mover a directorio de procesado
                 destino = settings.PROCCESED_DIR + file_name
