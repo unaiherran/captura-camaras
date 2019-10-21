@@ -158,8 +158,6 @@ def process_files(verbose=False):
             mensaje = '(%s/%s) %s subido a bucket %s/camera_images' % (i, total_de_archivos, file_name, bucket_name)
             process_logger.info(mensaje)
 
-            print('HOLA')
-
             if verbose:
                 print(mensaje)
 
@@ -179,14 +177,19 @@ def process_files(verbose=False):
 
                 cursor.execute(sql)
                 connection.commit()
+                if verbose:
+                    print(sql)
+                    
+                process_logger.info(sql)
 
-            # mover a directorio de procesado
-            destino = settings.PROCCESED_DIR + file_name
-            os.rename(file, destino)
-            mensaje = '\t %s movido a processed/%s' % (file, file_name)
-            process_logger.info(mensaje)
-            if verbose:
-                print(mensaje)
+
+                # mover a directorio de procesado
+                destino = settings.PROCCESED_DIR + file_name
+                os.rename(file, destino)
+                mensaje = '\t %s movido a processed/%s' % (file, file_name)
+                process_logger.info(mensaje)
+                if verbose:
+                    print(mensaje)
 
         else:
             # borrar archivo para no procesarlo otra vez)
@@ -235,15 +238,14 @@ def main():
     else:
         verbose = False
 
-    verbose = True
+    while True:
+        process_files(verbose=verbose)
+        delete_old_files(minutes=15, verbose=verbose)
 
-    # while True:
-    process_files(verbose=verbose)
-    # delete_old_files(minutes=15, verbose=verbose)
-    if verbose:
-        print('Esperando un rato...')
+        if verbose:
+            print('Esperando un rato...')
 
-    time.sleep(1)
+        time.sleep(60)
 
 
 if __name__ == '__main__':
