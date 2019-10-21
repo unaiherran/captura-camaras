@@ -242,8 +242,8 @@ def main():
 
         if verbose:
             print('Esperando un rato...')
-        to_s3_logger.info('Esperando 60 segundos')
-        time.sleep(60)
+        to_s3_logger.info('Esperando 30 segundos')
+        time.sleep(30)
         to_s3_logger.info('Otra vuelta')
 
 if __name__ == '__main__':
