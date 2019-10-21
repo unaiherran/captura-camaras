@@ -128,7 +128,7 @@ def process_files(process_logger, verbose=False):
     lista_archivos = glob.glob(directorio)
     total_de_archivos = len(lista_archivos)
     process_logger.info('Examinando %s archivos de SCRAP_DIR' % total_de_archivos)
-    
+
     connection = mysql.connector.connect(
         host=db_host,
         user=db_user,
@@ -242,9 +242,9 @@ def main():
 
         if verbose:
             print('Esperando un rato...')
-        to_s3_logger('Esperando 60 segundos')
+        to_s3_logger.info('Esperando 60 segundos')
         time.sleep(60)
-        to_s3_logger('Otra vuelta')
+        to_s3_logger.info('Otra vuelta')
 
 if __name__ == '__main__':
     main()
