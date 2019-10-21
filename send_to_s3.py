@@ -4,6 +4,9 @@ import glob, os, sys
 import argparse
 import time
 import settings
+from secret import *
+
+import mysql.connector
 
 import boto3
 from botocore.client import Config
@@ -130,6 +133,14 @@ def process_files(verbose=False):
     lista_archivos = glob.glob(directorio)
     total_de_archivos = len(lista_archivos)
 
+    connection = mysql.connector.connect(
+        host=db_host,
+        user=db_user,
+        passwd=db_passwd,
+        database=db_database,
+        port=db_port
+    )
+
     i = 0
 
     for file in lista_archivos:
@@ -146,13 +157,28 @@ def process_files(verbose=False):
             s3.Bucket(bucket_name).put_object(Key=key, Body=data)
             mensaje = '(%s/%s) %s subido a bucket %s/camera_images' % (i, total_de_archivos, file_name, bucket_name)
             process_logger.info(mensaje)
+
+            print('HOLA')
+
             if verbose:
                 print(mensaje)
 
             # pasarlo por rekognize
             num_cars, response = count_cars(key, bucket_name)
 
-            # todo escribir en BDD
+            # escribir en BDD
+            if connection.is_connected():
+                cursor = connection.cursor()
+                nombre_separado = file_name.split('_')
+                id_camara = nombre_separado[0]
+                fecha_str = nombre_separado[1] + '_' + nombre_separado[2]
+                fecha_imagen = 'STR_TO_DATE("{}", "%Y%m%d_%H%i.jpg")'.format(fecha_str)
+
+                sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
+                      f'({id_camara}, "{key}", "{response}", {num_cars}, {fecha_imagen});'
+
+                cursor.execute(sql)
+                connection.commit()
 
             # mover a directorio de procesado
             destino = settings.PROCCESED_DIR + file_name
@@ -213,7 +239,7 @@ def main():
 
     # while True:
     process_files(verbose=verbose)
-    delete_old_files(minutes=15, verbose=verbose)
+    # delete_old_files(minutes=15, verbose=verbose)
     if verbose:
         print('Esperando un rato...')
 
