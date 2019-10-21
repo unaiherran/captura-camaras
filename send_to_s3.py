@@ -177,7 +177,8 @@ def process_files(process_logger, verbose=False):
 
                 connection.commit()
                 if verbose:
-                    print(mini_sql)
+                    pass
+                    #print(mini_sql)
 
                 process_logger.info(mini_sql)
 
@@ -241,7 +242,7 @@ def main():
         delete_old_files(minutes=15, verbose=verbose)
 
         if verbose:
-            print('Esperando un rato...')
+            print('Esperando un rato...(30 segundos)')
         to_s3_logger.info('Esperando 30 segundos')
         time.sleep(30)
         to_s3_logger.info('Otra vuelta')
