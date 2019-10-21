@@ -92,8 +92,6 @@ def count_cars(photo, bucket):
 
     number_of_cars = 0
 
-    print(response['ResponseMetadata']['HTTPStatusCode'])
-
     if response['ResponseMetadata']['HTTPStatusCode'] == 200:
         for label in response['Labels']:
             if label['Name'] == 'Car':
