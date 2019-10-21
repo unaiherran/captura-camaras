@@ -106,10 +106,7 @@ def count_cars(photo, bucket):
     return number_of_cars, response
 
 
-def process_files(verbose=False):
-    process_logger = setup_logger('process_log', 'process_image.log')
-
-    output_list = []
+def process_files(process_logger, verbose=False):
 
     # Si no existe process dir, crearlo
     if not os.path.isdir(settings.PROCCESED_DIR):
@@ -239,7 +236,7 @@ def main():
         verbose = False
 
     while True:
-        process_files(verbose=verbose)
+        process_files(to_s3_logger, verbose=verbose)
         delete_old_files(minutes=15, verbose=verbose)
 
         if verbose:
