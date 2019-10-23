@@ -242,7 +242,7 @@ def main():
         delete_old_files(minutes=15, verbose=verbose)
 
         if verbose:
-            print('Esperando un rato...(30 segundos)')
+            print('Esperando un rato...(5 segundos)')
         to_s3_logger.info('Esperando 5 segundos')
         time.sleep(5)
         to_s3_logger.info('Otra vuelta')
