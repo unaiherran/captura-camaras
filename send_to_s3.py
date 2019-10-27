@@ -126,6 +126,7 @@ def process_files(process_logger, verbose=False):
     bucket_name = 'proyecto-bd3-ff'
 
     lista_archivos = glob.glob(directorio)
+    lista_archivos = lista_archivos[0:200]
     total_de_archivos = len(lista_archivos)
     process_logger.info('Examinando %s archivos de SCRAP_DIR' % total_de_archivos)
 
