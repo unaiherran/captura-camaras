@@ -129,9 +129,9 @@ def process_files(process_logger, verbose=False):
     total_de_archivos = len(lista_archivos)
 
     if verbose:
-        print(f'Quedan {total_de_archivos} por procesar. Proceso sólo 200')
+        print(f'Quedan {total_de_archivos} por procesar. Proceso sólo 20')
 
-    lista_archivos = lista_archivos[0:200]
+    lista_archivos = lista_archivos[0:20]
     total_de_archivos = len(lista_archivos)
     process_logger.info('Examinando %s archivos de SCRAP_DIR' % total_de_archivos)
 
