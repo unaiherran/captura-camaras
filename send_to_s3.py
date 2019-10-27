@@ -129,11 +129,15 @@ def process_files(process_logger, verbose=False):
     total_de_archivos = len(lista_archivos)
 
     if verbose:
-        print(f'Quedan {total_de_archivos} por procesar. Proceso sólo 50')
+        if total_de_archivos > 50:
+            mensaje = f'Quedan {total_de_archivos} por procesar. Proceso sólo 50'
+        else:
+            mensaje = f'Quedan {total_de_archivos}. Los porceso'
+        print(mensaje)
+        process_logger.info(mensaje)
 
     lista_archivos = lista_archivos[0:50]
     total_de_archivos = len(lista_archivos)
-    process_logger.info('Examinando %s archivos de SCRAP_DIR' % total_de_archivos)
 
     connection = mysql.connector.connect(
         host=db_host,
