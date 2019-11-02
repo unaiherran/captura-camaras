@@ -288,7 +288,7 @@ def main():
         process_files(to_s3_logger, verbose=verbose)
         delete_old_files(minutes=15, verbose=verbose)
         log_copiado, to_s3_logger = move_log_to_s3(log_copiado, to_s3_logger)
-
+        print('Ultimo log copiado a ', log_copiado)
         if verbose:
             print('Esperando un rato...(5 segundos)')
         to_s3_logger.info('Esperando 5 segundos')
