@@ -244,7 +244,9 @@ def move_log_to_s3(log_copiado, logger):
                             )
         bucket_name = 'proyecto-bd3-ff'
         filename = '/logs/to_s3_' + ahora.strftime('%Y-%m-%d') +'.log'
+        print('Filename:'+filename)
         s3.meta.client.upload_file('to_s3.log', bucket_name, filename)
+
         # delete log
         os.remove('to_s3.log')
 
