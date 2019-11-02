@@ -232,6 +232,8 @@ def delete_old_files(minutes=30, verbose=False):
 def move_log_to_s3(log_copiado, logger):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
+    ayer = ahora - timedelta(minutes=1)
+
     print(ahora)
     print(ayer)
     if log_copiado < ayer:
