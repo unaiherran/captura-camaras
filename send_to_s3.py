@@ -247,18 +247,20 @@ def upload_file(file_name, bucket, object_name=None):
     s3_client = boto3.client('s3')
     try:
         response = s3_client.upload_file(file_name, bucket, object_name)
+        print (response)
     except ClientError as e:
         logging.error(e)
         return False
     return True
+
 
 def move_log_to_s3(log_copiado, logger):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
     ayer = ahora - timedelta(minutes=1)
 
-    print(ahora)
-    print(ayer)
+    print("Ahora: ", ahora)
+    print("Ayer:", ayer)
     if log_copiado < ayer:
         print('tengo que copiar')
         # copy log to s3
