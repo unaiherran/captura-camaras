@@ -229,12 +229,12 @@ def delete_old_files(minutes=30, verbose=False):
                                                                                             time.localtime(max_time))))
 
 
-def move_log_to_s3(log_copiado):
+def move_log_to_s3(log_copiado, logger):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
     print(ahora)
     print(ayer)
-    if log_copiado > ayer:
+    if log_copiado < ayer:
         print('tengo que copiar')
         # copy log to s3
         s3 = boto3.resource('s3',
@@ -246,10 +246,13 @@ def move_log_to_s3(log_copiado):
         # delete log
         os.remove('to_s3.log')
 
+        # new logger
+        logger = setup_logger('to_s3_log', 'to_s3.log')
+
         # actualizar hora de copia
         log_copiado = ahora
 
-    return log_copiado
+    return log_copiado, logger
 
 
 
@@ -279,7 +282,7 @@ def main():
     while True:
         process_files(to_s3_logger, verbose=verbose)
         delete_old_files(minutes=15, verbose=verbose)
-        move_log_to_s3(log_copiado)
+        log_copiado, to_s3_logger = move_log_to_s3(log_copiado, to_s3_logger)
 
         if verbose:
             print('Esperando un rato...(5 segundos)')
