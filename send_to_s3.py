@@ -140,7 +140,7 @@ def process_files(process_logger, verbose=False):
         print(mensaje)
         process_logger.info(mensaje)
 
-    lista_archivos = lista_archivos[0:10]
+    lista_archivos = lista_archivos[0:50]
     total_de_archivos = len(lista_archivos)
 
     connection = mysql.connector.connect(
@@ -233,7 +233,9 @@ def delete_old_files(minutes=30, verbose=False):
 def move_log_to_s3(log_copiado, logger):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
-    ayer = ahora - timedelta(minutes=1)
+
+    # PAra DEBUG
+    # ayer = ahora - timedelta(minutes=1)
 
     if log_copiado < ayer:
         print('tengo que copiar')
@@ -286,7 +288,7 @@ def main():
         process_files(to_s3_logger, verbose=verbose)
         delete_old_files(minutes=15, verbose=verbose)
         log_copiado, to_s3_logger = move_log_to_s3(log_copiado, to_s3_logger)
-        print('Ultimo log copiado a ', log_copiado)
+
         if verbose:
             print('Esperando un rato...(5 segundos)')
         to_s3_logger.info('Esperando 5 segundos')
