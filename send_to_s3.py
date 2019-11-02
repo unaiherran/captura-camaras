@@ -6,6 +6,9 @@ import time
 import settings
 from secret import *
 
+from datetime import datetime
+from datetime import timedelta
+
 import mysql.connector
 
 import boto3
@@ -226,6 +229,27 @@ def delete_old_files(minutes=30, verbose=False):
                                                                                             time.localtime(max_time))))
 
 
+def move_log_to_s3(log_copiado):
+    ahora = datetime.now()
+    ayer = ahora - timedelta(days=1)
+    if log_copiado > ayer:
+        # copy log to s3
+        s3 = boto3.resource('s3',
+                            config=Config(signature_version='s3v4')
+                            )
+        bucket_name = 'proyecto-bd3-ff'
+        filename = '/logs/to_s3_' + ahora.strftime('%Y-%m-%d') +'.log'
+        s3.meta.client.upload_file('to_s3.log', bucket_name, filename)
+        # delete log
+        os.remove('to_s3.log')
+
+        # actualizar hora de copia
+        log_copiado = ahora
+
+    return log_copiado
+
+
+
 def main():
     descripcion = """Esta es la ayuda del script"""
 
@@ -234,6 +258,8 @@ def main():
     parser = argparse.ArgumentParser(description=descripcion)
     parser.add_argument("-V", "--version", help="show program version", action="store_true")
     parser.add_argument("-v", "--verbose", help="", action="store_true")
+
+    log_copiado = datetime.now()
 
     # read arguments from the command line
     args = parser.parse_args()
@@ -250,6 +276,7 @@ def main():
     while True:
         process_files(to_s3_logger, verbose=verbose)
         delete_old_files(minutes=15, verbose=verbose)
+        move_log_to_s3(log_copiado)
 
         if verbose:
             print('Esperando un rato...(5 segundos)')
