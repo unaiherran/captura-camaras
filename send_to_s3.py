@@ -245,16 +245,18 @@ def move_log_to_s3(log_copiado, logger):
         bucket_name = 'proyecto-bd3-ff'
         filename = '/logs/to_s3_' + ahora.strftime('%Y-%m-%d') +'.log'
         print('Filename:'+filename)
-        s3.meta.client.upload_file('to_s3.log', bucket_name, filename)
+        try:
+            s3.client.upload_file('to_s3.log', bucket_name, filename)
+            # delete log
+            os.remove('to_s3.log')
+            # new logger
+            logger = setup_logger('to_s3_log', 'to_s3.log')
 
-        # delete log
-        os.remove('to_s3.log')
+            # actualizar hora de copia
+            log_copiado = ahora
 
-        # new logger
-        logger = setup_logger('to_s3_log', 'to_s3.log')
-
-        # actualizar hora de copia
-        log_copiado = ahora
+        except ClientError as e:
+            logger.error(e)
 
     return log_copiado, logger
 
