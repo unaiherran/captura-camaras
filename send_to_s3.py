@@ -245,7 +245,7 @@ def move_log_to_s3(log_copiado, logger):
                             )
         bucket_name = 'proyecto-bd3-ff'
 
-        data = open('to_s3.log', "r")
+        data = open('to_s3.log', "rb")
         key = 'logs/to_s3_' + ahora.strftime('%Y-%m-%d') + '.log'
 
         s3.Bucket(bucket_name).put_object(Key=key, Body=data)
