@@ -232,7 +232,10 @@ def delete_old_files(minutes=30, verbose=False):
 def move_log_to_s3(log_copiado):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
+    print(ahora)
+    print(ayer)
     if log_copiado > ayer:
+        print('tengo que copiar')
         # copy log to s3
         s3 = boto3.resource('s3',
                             config=Config(signature_version='s3v4')
