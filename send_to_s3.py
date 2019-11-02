@@ -230,30 +230,6 @@ def delete_old_files(minutes=30, verbose=False):
                                                                                             time.localtime(max_time))))
 
 
-def upload_file(file_name, bucket, object_name=None):
-    """Upload a file to an S3 bucket
-
-    :param file_name: File to upload
-    :param bucket: Bucket to upload to
-    :param object_name: S3 object name. If not specified then file_name is used
-    :return: True if file was uploaded, else False
-    """
-
-    # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = file_name
-
-    # Upload the file
-    s3_client = boto3.client('s3')
-    try:
-        response = s3_client.upload_file(file_name, bucket, object_name)
-        print (response)
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
-
-
 def move_log_to_s3(log_copiado, logger):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
@@ -268,9 +244,11 @@ def move_log_to_s3(log_copiado, logger):
                             config=Config(signature_version='s3v4')
                             )
         bucket_name = 'proyecto-bd3-ff'
-        objectname = '/logs/to_s3_' + ahora.strftime('%Y-%m-%d') +'.log'
 
-        upload_file('to_s3.log', bucket_name, objectname)
+        data = open('to_s3.log', "r")
+        key = 'logs/to_s3_' + ahora.strftime('%Y-%m-%d') + '.log'
+
+        s3.Bucket(bucket_name).put_object(Key=key, Body=data)
 
         # delete log
         os.remove('to_s3.log')
