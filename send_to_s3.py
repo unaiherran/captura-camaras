@@ -233,10 +233,8 @@ def delete_old_files(minutes=30, verbose=False):
 def move_log_to_s3(log_copiado, logger):
     ahora = datetime.now()
     ayer = ahora - timedelta(days=1)
-    ayer = ahora - timedelta(minutes=5)
+    ayer = ahora - timedelta(minutes=1)
 
-    print("Ahora: ", ahora)
-    print("Ayer:", ayer)
     if log_copiado < ayer:
         print('tengo que copiar')
         # copy log to s3
@@ -246,7 +244,7 @@ def move_log_to_s3(log_copiado, logger):
         bucket_name = 'proyecto-bd3-ff'
 
         data = open('to_s3.log', "rb")
-        key = 'logs/to_s3_' + ahora.strftime('Y-%m-%dT%H:%M:%S') + '.log'
+        key = 'logs/to_s3_' + ahora.strftime('%Y-%m-%dT%H:%M:%S') + '.log'
 
         s3.Bucket(bucket_name).put_object(Key=key, Body=data)
 
@@ -254,11 +252,11 @@ def move_log_to_s3(log_copiado, logger):
         os.remove('to_s3.log')
         # new logger
         logger = setup_logger('to_s3_log', 'to_s3.log')
+        logger.info (f'Log copiado a S3: {key}')
         # actualizar hora de copia
         log_copiado = ahora
 
     return log_copiado, logger
-
 
 
 def main():
