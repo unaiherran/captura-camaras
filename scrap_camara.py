@@ -37,7 +37,8 @@ def crawl(lista_camaras=settings.lista_camaras, status_req=0, verbose=False):
     # For each camera
     for camera in lista_camaras:
         i += 1
-
+        if len(camera)<6:
+            continue
         try:
             address = camera[1]
         except IndexError:
