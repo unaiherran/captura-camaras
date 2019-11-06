@@ -37,7 +37,7 @@ def crawl(lista_camaras=settings.lista_camaras, status_req=0, verbose=False):
     # For each camera
     for camera in lista_camaras:
         i += 1
-        print (camera)
+
         try:
             address = camera[1]
         except IndexError:
