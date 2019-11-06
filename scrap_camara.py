@@ -38,7 +38,11 @@ def crawl(lista_camaras=settings.lista_camaras, status_req=0, verbose=False):
     for camera in lista_camaras:
         i += 1
         print (camera)
-        address = camera[1]
+        try:
+            address = camera[1]
+        except IndexError:
+            continue
+
         status = int(camera[5])
 
         now = datetime.now()
