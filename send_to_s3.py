@@ -14,8 +14,6 @@ import mysql.connector
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
-from botocore.errorfactory import
-
 
 import hashlib
 from utils import setup_logger
