@@ -140,7 +140,7 @@ def process_files(process_logger, verbose=False):
         print(mensaje)
         process_logger.info(mensaje)
 
-    lista_archivos = lista_archivos[0:20]
+    lista_archivos = lista_archivos[0:50]
     total_de_archivos = len(lista_archivos)
 
     connection = mysql.connector.connect(
