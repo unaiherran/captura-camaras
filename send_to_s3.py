@@ -95,7 +95,7 @@ def count_cars(photo, bucket):
         response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}}, MaxLabels=max_labels)
     except ClientError:
         print('ERROR EN LA RESPUESTA')
-        return 9999,'NO Response'
+        return 999999,'NO Response'
 
     number_of_cars = 0
 
@@ -177,35 +177,36 @@ def process_files(process_logger, verbose=False):
             # pasarlo por rekognize
             num_cars, response = count_cars(key, bucket_name)
 
-            # escribir en BDD
-            if connection.is_connected():
-                cursor = connection.cursor()
-                nombre_separado = file_name.split('_')
-                id_camara = nombre_separado[0]
-                fecha_str = nombre_separado[1] + '_' + nombre_separado[2]
-                fecha_imagen = 'STR_TO_DATE("{}", "%Y%m%d_%H%i.jpg")'.format(fecha_str)
+            if response !='NO Response':
+                # escribir en BDD
+                if connection.is_connected():
+                    cursor = connection.cursor()
+                    nombre_separado = file_name.split('_')
+                    id_camara = nombre_separado[0]
+                    fecha_str = nombre_separado[1] + '_' + nombre_separado[2]
+                    fecha_imagen = 'STR_TO_DATE("{}", "%Y%m%d_%H%i.jpg")'.format(fecha_str)
 
-                sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
-                      f'({id_camara}, "{key}", "{response}", {num_cars}, {fecha_imagen});'
+                    sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
+                          f'({id_camara}, "{key}", "{response}", {num_cars}, {fecha_imagen});'
 
-                mini_sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
-                      f'({id_camara}, "{key}", "[response]", {num_cars}, {fecha_imagen});'
-                cursor.execute(sql)
+                    mini_sql = f'INSERT INTO ImagenesCamarasTrafico(id_camara,imagen,response,num_cars,fecha) values ' \
+                          f'({id_camara}, "{key}", "[response]", {num_cars}, {fecha_imagen});'
+                    cursor.execute(sql)
 
-                connection.commit()
-                if verbose:
-                    pass
-                    #print(mini_sql)
+                    connection.commit()
+                    if verbose:
+                        pass
+                        #print(mini_sql)
 
-                process_logger.info(mini_sql)
+                    process_logger.info(mini_sql)
 
-                # mover a directorio de procesado
-                destino = settings.PROCCESED_DIR + file_name
-                os.rename(file, destino)
-                mensaje = '\t %s movido a processed/%s' % (file, file_name)
-                process_logger.info(mensaje)
-                if verbose:
-                    print(mensaje)
+                    # mover a directorio de procesado
+                    destino = settings.PROCCESED_DIR + file_name
+                    os.rename(file, destino)
+                    mensaje = '\t %s movido a processed/%s' % (file, file_name)
+                    process_logger.info(mensaje)
+                    if verbose:
+                        print(mensaje)
 
         else:
             # borrar archivo para no procesarlo otra vez)
