@@ -94,6 +94,7 @@ def count_cars(photo, bucket):
     try:
         response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}}, MaxLabels=max_labels)
     except ClientError:
+        print('ERROR EN LA RESPUESTA')
         return 9999,'NO Response'
 
     number_of_cars = 0
