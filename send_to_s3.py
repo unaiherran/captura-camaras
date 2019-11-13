@@ -14,6 +14,8 @@ import mysql.connector
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
+from botocore.errorfactory import
+
 
 import hashlib
 from utils import setup_logger
@@ -91,8 +93,10 @@ def count_cars(photo, bucket):
 
     client = boto3.client('rekognition')
     max_labels = settings.MAX_LABELS
-
-    response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}}, MaxLabels=max_labels)
+    try:
+        response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}}, MaxLabels=max_labels)
+    except ClientError:
+        return 9999,'NO Response'
 
     number_of_cars = 0
 
