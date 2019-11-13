@@ -140,7 +140,7 @@ def process_files(process_logger, verbose=False):
         print(mensaje)
         process_logger.info(mensaje)
 
-    lista_archivos = lista_archivos[0:50]
+    lista_archivos = lista_archivos[0:20]
     total_de_archivos = len(lista_archivos)
 
     connection = mysql.connector.connect(
@@ -290,9 +290,9 @@ def main():
         log_copiado, to_s3_logger = move_log_to_s3(log_copiado, to_s3_logger)
 
         if verbose:
-            print('Esperando un rato...(5 segundos)')
-        to_s3_logger.info('Esperando 5 segundos')
-        time.sleep(5)
+            print('Esperando un rato...(1 segundo)')
+        to_s3_logger.info('Esperando 1 segundo')
+        time.sleep(1)
         to_s3_logger.info('Otra vuelta')
 
 if __name__ == '__main__':
