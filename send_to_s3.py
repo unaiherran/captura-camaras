@@ -95,7 +95,7 @@ def count_cars(photo, bucket):
         response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}}, MaxLabels=max_labels)
     except ClientError:
         print('ERROR EN LA RESPUESTA')
-        return 999999,'NO Response'
+        return 999999,'IMAGE INVALID. DO NOT SAVE.'
 
     number_of_cars = 0
 
@@ -177,7 +177,7 @@ def process_files(process_logger, verbose=False):
             # pasarlo por rekognize
             num_cars, response = count_cars(key, bucket_name)
 
-            if response !='NO Response':
+            if response != 'IMAGE INVALID. DO NOT SAVE.':
                 # escribir en BDD
                 if connection.is_connected():
                     cursor = connection.cursor()
