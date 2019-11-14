@@ -163,21 +163,30 @@ def process_files(process_logger, verbose=False):
 
         # Mirar si esta ya procesado (tamaño, small hash y full hash)
         if not is_processed(file):
-
+            skip = False
             # copiar a amazon s3
             data = open(file, "rb")
             key = 'camera_images/' + file_name
-            s3.Bucket(bucket_name).put_object(Key=key, Body=data)
-            mensaje = '(%s/%s) %s subido a bucket %s/camera_images' % (i, total_de_archivos, file_name, bucket_name)
-            process_logger.info(mensaje)
+            try:
+                s3.Bucket(bucket_name).put_object(Key=key, Body=data)
+                mensaje = '(%s/%s) %s subido a bucket %s/camera_images' % (i, total_de_archivos, file_name, bucket_name)
+                process_logger.info(mensaje)
+
+            except ClientError:
+                skip = True
+                mensaje = f'{file_name} no ha sido subido. Lo intento en otro momento'
+                process_logger.erro(mensaje)
 
             if verbose:
                 print(mensaje)
 
             # pasarlo por rekognize
-            num_cars, response = count_cars(key, bucket_name)
+            if not skip:
+                num_cars, response = count_cars(key, bucket_name)
+                if response = 'IMAGE INVALID. DO NOT SAVE.':
+                    skip = True
 
-            if response != 'IMAGE INVALID. DO NOT SAVE.':
+            if not skip:
                 # escribir en BDD
                 if connection.is_connected():
                     cursor = connection.cursor()
