@@ -183,7 +183,7 @@ def process_files(process_logger, verbose=False):
             # pasarlo por rekognize
             if not skip:
                 num_cars, response = count_cars(key, bucket_name)
-                if response = 'IMAGE INVALID. DO NOT SAVE.':
+                if response == 'IMAGE INVALID. DO NOT SAVE.':
                     skip = True
 
             if not skip:
