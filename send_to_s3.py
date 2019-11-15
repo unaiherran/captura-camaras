@@ -175,7 +175,7 @@ def process_files(process_logger, verbose=False):
             except ClientError:
                 skip = True
                 mensaje = f'{file_name} no ha sido subido. Lo intento en otro momento'
-                process_logger.erro(mensaje)
+                process_logger.error(mensaje)
 
             if verbose:
                 print(mensaje)
